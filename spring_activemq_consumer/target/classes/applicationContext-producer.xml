@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:amp="http://activemq.apache.org/schema/core"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:jms="http://www.springframework.org/schema/jms"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/activemq-core.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/jms http://www.springframework.org/schema/jms/spring-jms.xsd">
+
+    <!--1.创建工厂对象-->
+    <amp:connectionFactory id="connectionFactory"
+        brokerURL="tcp://49.233.37.118:61616"
+        userName="admin"
+        password="adminqaz"
+    />
+
+    <!--2. 创建缓存连接工厂,类似于连接池-->
+    <bean id="cachingConnectionFactory" class="org.springframework.jms.connection.CachingConnectionFactory">
+        <!-- 注入缓存工厂-->
+        <property name="targetConnectionFactory" ref="connectionFactory"/>
+        <!-- 缓存消息数量-->
+        <property name="sessionCacheSize" value="5"/>
+    </bean>
+
+    <!-- 对于消费者的 bean 除了 1 和2 还需要下满的配置-->
+    <!-- 3. 配置消息监听组件扫描-->
+    <context:component-scan base-package="com.xiaofeifei.listener"/>
+
+    <!--4 配置监听器（点对点） destination-type="queue" 指定的是点对点的订阅 -->
+    <jms:listener-container connection-factory="cachingConnectionFactory" destination-type="queue">
+        <jms:listener destination="spring_queue" ref="queueListener"/> <!-- queListener是我们在com.xiaofeifei.listener 包下写的，因为扫描了所以可以注入-->
+    </jms:listener-container>
+
+    <!--5 配置监听器（订阅和发布） destination-type="topic" 指定的是点对点的订阅 -->
+    <jms:listener-container connection-factory="cachingConnectionFactory" destination-type="topic">
+        <jms:listener destination="spring_topic" ref="topicListener"/> <!-- queListener是我们在com.xiaofeifei.listener 包下写的，因为扫描了所以可以注入-->
+    </jms:listener-container>
+</beans>

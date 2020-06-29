@@ -1,0 +1,13 @@
+server:
+  port: 9002 #端口
+spring:
+  application:
+    name:activemq-producer #服务名称
+#springboot 与acitvemq整合
+  activemq:
+    broker-url: tcp://49.233.37.118:61616 #连接地址
+    user: admin #activemq 用户名
+    password: adminqaz  #activemq的密码
+# 指定发送的模式（点对点，发布订阅）
+  jms:
+    pub-sub-domain: false  # false表示点对点
